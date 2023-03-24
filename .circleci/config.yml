@@ -22,3 +22,5 @@ workflows:
       - docker/publish:
           image: circleci-springboot 
           deploy: true
+          requires:
+            - build-and-test
