@@ -1,39 +1,38 @@
 version: 2.1
 
-jobs:
+orbs:
+  docker: circleci/docker@2.2.0
 
-  # build-and-junit-test:
-  #   docker:
-  #     - image: cimg/openjdk:11.0
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Build
-  #         command: mvn -B -DskipTests clean package
-  #     - run:
-  #         name: Junit Test
-  #         command: 
-  # build-and-junit-test:
-  #   docker:
-  #     - image: circleci/openjdk:8-jdk
-  #   working_directory: ~/repo
-  #   steps:
-  #     - checkout
-  #     - run: mvn install
-  #     - store_test_results:
-  #         path: target/surefire-reports
-  build-and-junit-test:
+jobs:
+  build-and-test:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:11.0
     working_directory: ~/repo
     steps:
       - checkout
       - run: mvn install
       - store_test_results:
           path: target/surefire-reports
-
+  docker-build-publish:
+    docker:
+      # replace with your preferred image
+      - image: cimg/base:stable
+    steps:
+      - docker/build:
+          image: circleci-springboot 
+          lint-dockerfile: false
+      - docker/publish:
+            image: circleci-springboot 
+            remote-docker-dlc: false 
+            deploy: true 
+            lint-dockerfile: false 
+            treat-warnings-as-errors: false 
+            update-description: false 
+            use-buildkit: false 
+            use-docker-credentials-store: false 
+            use-remote-docker: false 
 
 workflows:
   sample: 
     jobs:
-      - build-and-junit-test
+      - build-and-test
